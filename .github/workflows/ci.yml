@@ -8,20 +8,21 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-  steps: 
-    - name: Checkout Code
-      uses: actions/checkout@v4
 
-    - name: Setup Go
-      uses: actions/setup-go@v5
-      with: 
-        go-version: "1.24"
-    
-    - name: Download Dependencies
-      run: go mod tidy
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Build Project
-      run: go build ./...
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
 
-    - name: Run Tests
-      run: go test ./...
+      - name: Download Dependencies
+        run: go mod tidy
+
+      - name: Build Project
+        run: go build ./...
+
+      - name: Run Tests
+        run: go test ./...
