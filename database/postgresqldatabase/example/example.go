@@ -174,7 +174,7 @@ func main() {
 	router.HandleFunc("/addProducts", addProducts).Methods("POST")
 	router.HandleFunc("/products", getproducts).Methods("GET")
 	router.HandleFunc("/ProductById/{pid}", productsByid).Methods("GET")
-	router.HandleFunc("/ProductById/{name}", productsByName).Methods("GET")
+	router.HandleFunc("/ProductByName/{name}", productsByName).Methods("GET")
 	router.HandleFunc("/updateProducts/{pid}", updateProducts).Methods("PUT")
 	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE")
 	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE")
