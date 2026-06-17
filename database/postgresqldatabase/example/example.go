@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
@@ -141,7 +142,7 @@ func deleteProducts(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	//connStr := "postgres://postgres:nuthana@localhost:5432/users"
-	connStr := "postgres://postgres:nuthana@host.docker.internal:5432/users"
+	connStr := os.Getenv("db_url")
 
 	var err error
 	conn, err = pgx.Connect(context.Background(), connStr)
