@@ -80,6 +80,25 @@ func productsByid(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+func productsByName(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	name := params["name"]
+
+	row := conn.QueryRow(
+		context.Background(),
+		"select * from products where name = $2",
+		name,
+	)
+	var p Products
+	err := row.Scan(&p.Pid, &p.Name, &p.Price)
+
+	if err != nil {
+		fmt.Fprint(w, "product not found")
+		return
+	}
+	json.NewEncoder(w).Encode(p)
+}
+
 func updateProducts(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	pid := params["pid"]
@@ -155,6 +174,7 @@ func main() {
 	router.HandleFunc("/addProducts", addProducts).Methods("POST")
 	router.HandleFunc("/products", getproducts).Methods("GET")
 	router.HandleFunc("/ProductById/{pid}", productsByid).Methods("GET")
+	router.HandleFunc("/ProductById/{name}", productsByName).Methods("GET")
 	router.HandleFunc("/updateProducts/{pid}", updateProducts).Methods("PUT")
 	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE")
 	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE")
