@@ -86,7 +86,7 @@ func productsByName(w http.ResponseWriter, r *http.Request) {
 
 	row := conn.QueryRow(
 		context.Background(),
-		"select * from products where name = $2",
+		"select * from products where name = $1",
 		name,
 	)
 	var p Products
