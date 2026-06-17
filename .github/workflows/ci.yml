@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +26,6 @@ jobs:
 
       - name: Run Tests
         run: go test ./...
+      
+      - name: Trigger Render deploy 
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
