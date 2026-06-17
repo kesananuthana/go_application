@@ -1,3 +1,6 @@
+The Go programming language (Golang) is primarily used for backend development, cloud-native infrastructure, DevOps automation, and large-scale distributed systems. 
+Developed by Google, 
+
 package main : this is an executable program and Without it, your code becomes a library, not something you can run
 func main() : This is the starting point of execution. Go automatically starts from main()
 fmt (package)
