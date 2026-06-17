@@ -1,0 +1,502 @@
+package main : this is an executable program and Without it, your code becomes a library, not something you can run
+func main() : This is the starting point of execution. Go automatically starts from main()
+fmt (package)
+fmt stands for format
+It is a standard library package used for:
+printing output
+formatting text
+In Go language we can't write normal print stmts like print('hii)
+Println is works correctly
+
+variables:
+var a= 10;
+for varibales declaration use var keyword
+
+Datatypes:
+there are seven Datatypes
+it mainly categorized into 3 types:
+basic types,composite types and referrence types
+basic types:
+int,float64,bool,string
+for giving datatypes to variables syntax is var variable value and datatype = value;ex: var a int =10
+In go when we decleare any varibale but we didn't use at that it shows error.
+In go if didn't assign values for varibales it prints default values
+default value int is 0, default value of 0, string prints default as empty
+Go can automatically infer the type based on inital value of varibale
+for ex if we declare var a =10 ,it knows the a is int datatype
+we can also declare vaiables like this way
+name: = "new
+multiple variables declaration of same datatype at a time
+ex : var a,b,c int =1,2,3
+for constant varibales declaration use const keyword const pi=3.14
+
+Go output functions:
+Print() => it is used for prints the output
+Println() => prints values with space in between and adds a new line at the end
+Printf() => it is used for formats arguments %T is used for priting the datatype and %v is used for printing the value
+
+loops:
+there is no while loop
+for i = 0; i < 5; i++ {
+		if i == 3 {
+			break
+		}
+		fmt.Print(i)
+	}
+
+	b = 5
+	for b >= 1 {
+		fmt.Println("value of b", b)
+		b--
+	}
+functions:
+An anonymous function in Go is a function without a name that is often used for one-time operations, especially inside goroutines or callbacks.
+//defer is used to delay the execution of a function until the surrounding function finishes.
+In simple words:
+
+//Panic:
+It stops program immedetaly 
+ex : panic("something went wrong)
+“Run this later, just before the function ends.”
+
+//Recover
+recover is used to stop a crash caused by panic. In simple words: recover = “Don’t crash, handle it and continue”
+for recover we must and use defer .otherwise it will not work
+recover() only works when it is called inside a deferred function.
+
+//Pointers
+pointer as a variable that stores the memory address of another variable, instead of storing the actual value.
+Pointersare used in Modify value inside a function,Working with structs,Sharing data between functions
+
+//interfaces
+An interface is used to define behavior without caring about the exact type.
+uses of Interfaces:
+->treat different things in the same way
+for ex:Imagine:
+Rectangle
+Circle
+They are different, but both can calculate area.
+Instead of writing separate logic for each, you use an interface.
+->make your code flexible
+Without interfaces:
+Your code depends on specific types (Rectangle only)
+With interfaces:
+Your code works with any type that follows the rule
+->improve reusability
+Empty interface:
+The empty interface type written as interface{}
+It can store any value of type that has one or more method.It can be used to represent values where type is unknown.
+A slice of empty interfaces that can store mixed data types
+type assertion and type switch can be used to deduce type from an empty interface
+type assertion:
+It is used to asset type for an empty interface. 
+it is different from type conversion and can panic
+type switch:
+It can be used to chcek against multiple types
+
+//package & modules
+go mod init filename . this command is used for It initializes a Go module for your project. and this file used for adding dependencies
+there are different types of packages ,ex:fmt,math,sort,etc.
+In packages has function give the func names as uppercase when Uppercase first letter = exported/public.
+Module = collection of packages + version
+
+
+//Go Routines
+A Goroutine is a lightweight thread managed by Go.
+It allows your program to run multiple functions at the same time (concurrently).
+To run a function as a goroutine, just add go keyword
+Normal function: Runs one after another
+Goroutine: Runs independently (in parallel/concurrently)
+
+why we use goroutines :
+Because they make programs faster and efficient when tasks don’t depend on each other.
+Without Goroutines:
+One task finishes → then next starts
+Total time = sum of all tasks
+With Goroutines:
+Multiple tasks run together
+Total time = much less
+
+where goroutines are used:
+In APIs / Web Servers
+
+When many users send requests:
+->In APIs / Web Servers
+Each request runs as a goroutine
+So server handles many users at once
+->File Processing
+Reading multiple files
+Writing logs
+Data processing
+->Network Calls / APIs
+Calling multiple APIs
+Fetching data from different services
+->Background Tasks
+Sending emails
+Notifications
+Logging
+->Real-Time Systems
+Chat apps
+Streaming
+Gaming
+
+How it behaves:
+Starts when you use the go keyword
+Runs in the background
+Does not block the main program
+Managed by Go runtime (not directly by OS threads)
+
+When we use go before a function, it runs that function concurrently in the background. 
+The main function does not wait for it. If the main function finishes before the goroutine completes, the program exits and the goroutine may not finish executing. 
+That’s why we use time.Sleep, WaitGroup, or channels to ensure goroutines complete properly.
+
+ex:
+
+func main() {
+	say()
+	go hello()
+	fmt.Println("Main function")
+}
+
+func say() {
+	fmt.Println("Hello from Goroutine")
+}
+
+func hello() {
+	fmt.Println("hii")
+} 
+
+output: Hello from Goroutine, Main function
+
+ex2:
+func main() {
+	say()
+	go hello()
+	time.Sleep(time.Second)
+	fmt.Println("Main function")
+}
+
+func say() {
+	fmt.Println("Hello from Goroutine")
+}
+
+func hello() {
+	fmt.Println("hii")
+}
+
+output: Hello from Goroutine, hii and Main function, why here it prints Hii ,we gave time.second at that the main function waits to 
+finish the hello function and then main execution is completed
+
+ex3:package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	go hello()
+	go display()
+	fmt.Scanln()
+}
+
+func hello() {
+	for i := 0; i < 3; i++ {
+		fmt.Println("display hello")
+	}
+}
+
+func display() {
+	for i := 0; i < 3; i++ {
+		fmt.Println("display hii")
+	}
+} 
+
+output: display hii
+display hii
+display hii
+display hello
+display hello
+display hello
+Output prints fully because fmt.Scanln() keeps the program running until you press Enter, 
+giving goroutines enough time to complete.
+
+
+->Correct ways to handle Goroutines
+1. time.Sleep (learning only)
+time.Sleep(time.Second)
+2. WaitGroup (best practice)
+Used in real applications (important for interviews)
+3. Channels
+Used for communication + synchronization
+=> time.Sleep (learning only)
+time.Sleep(time.Second)
+In previous code we use time.sleep it not works for all time.Because we are guessing the time.it is not realiable May fail if task takes longer
+=>Wait Group:
+WaitGroup is used to: Make main() wait until all goroutines finish
+ex:func main() {
+	var wg sync.WaitGroup
+	wg.Add(3) //it means we are starting 2 goroutines
+	go task("A", &wg)
+	go task("B", &wg)
+	task("c", &wg)
+	wg.Wait() //wait until finish
+	fmt.Println("All tasks are completed")
+}
+
+func task(name string, wg *sync.WaitGroup) {
+	defer wg.Done() // tell "I am finished"
+	fmt.Println("I am ", name)
+}
+here why we used pointer(&wg). beacuse it uses the same address not copy. 
+sync.WaitGroup : This is a type from Go:
+A structure that helps wait for goroutines to finish
+wg *sync.WaitGroup means we are passing a pointer so all goroutines share and modify the same WaitGroup instance instead of working on copies.
+defer &wg.Done() : To ensure the goroutine ALWAYS signals completion safely
+We pass &wg to share the same WaitGroup, and use defer wg.Done() to guarantee that the goroutine always marks itself as finished even if it exits early.
+In above code I didn't give goroutine to  task c even also it works:
+Task C works because WaitGroup depends only on Done() calls, not whether the function is a goroutine or a normal function.
+Yes, WaitGroup works with both goroutines and normal functions, because it only tracks Done() calls, not how the function is executed.
+=>WaitGroup does NOT track:
+goroutines
+threads
+background tasks
+it only tracks: how many times Done() is called
+
+If WaitGroup works for normal functions too, why is it said under goroutines?
+WaitGroup is not a goroutine feature
+It is a synchronization tool
+But it is mostly used with goroutines, so it is discussed there.
+Because in real programs:
+WaitGroup is mainly used when:
+many goroutines are running
+we need to wait for them all to finish
+ex :With goroutines:
+go task()
+go task()
+go task()
+
+Now main does NOT wait
+So we NEED WaitGroup
+
+ex:
+func main() {
+	var wg sync.WaitGroup
+	wg.Add(3) //it means we are starting 2 goroutines
+	go task("A", &wg)
+	go task("B", &wg)
+	task("c", &wg)
+	go hello()
+	wg.Wait() //wait until finish
+	fmt.Println("All tasks are completed")
+	go display()
+	say()
+	time.Sleep(time.Second)
+}
+
+func say() {
+	fmt.Println("Hello from Goroutine")
+}
+
+func hello() {
+	for i := 0; i < 3; i++ {
+		fmt.Println(i)
+	}
+}
+
+func display() {
+	for i := 0; i < 3; i++ {
+		fmt.Println("display hii")
+	}
+}
+
+func task(name string, wg *sync.WaitGroup) {
+	defer wg.Done() // tell "I am finished"
+	fmt.Println("I am ", name)
+} output: I am  c
+0
+1
+2
+I am  A
+I am  B
+All tasks are completed
+Hello from Goroutine
+display hii
+display hii
+display hii .here first normal function tast c is called then why it called hello insted of task a and b
+output:
+hello() runs before task A and B because goroutines are scheduled by Go runtime, not executed in written order. 
+The scheduler gave CPU time to hello() first, so it printed earlier.
+
+Channels:
+A channel is a way for goroutines to: Send data to each other safely
+Simple meaning
+Goroutine A = sender 
+Goroutine B = receiver 
+Channel = pipe between them 
+2. Why do we need channels?
+Without channels:
+Goroutines run independently
+No safe way to share data
+Risk of confusion or race conditions
+Channels solve this by:
+Safe communication + synchronization
+Important:
+Channel is blocking
+sender waits if no receiver
+receiver waits if no sender
+
+Channels can work with normal functions only if send and receive don’t block each other.
+
+There are 2 ways this can happen:
+1. Using buffered channel
+func main() {
+	ch := make(chan string, 1) //It has space to store 1 value
+	task(ch)
+	msg := <-ch
+	fmt.Println(msg)
+}
+
+func task(ch chan string) {
+	ch <- "Normal function"
+}
+
+Why companies use channels
+✔ Safe communication
+✔ No data corruption
+✔ Easy concurrency
+✔ Clean design
+✔ Better performance
+
+Creating Http Servers
+For creating web servers we need net/http packages
+net/http is a standard library package in Go.
+It helps you create web servers
+It helps you handle HTTP requests & responses
+net = networking
+It helps programs talk to each other over a network
+it handles:
+IP addresses (192.168.1.1)
+Ports (8080)
+Connections between computers
+Example:
+One computer sends data
+Another computer receives it
+That communication is handled by net
+difference btw net and http:
+net	-- Low-level networking (connection, TCP, IP)
+http -- High-level protocol built on top of net
+
+ex : for creating web server
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+func handler(w http.ResponseWriter, r *http.Request) { 
+	fmt.Fprint(w, "Web server created success")
+}
+// r *http.Request : contains incoming request w http.ResponseWriter Used to send response to client
+func main() {
+	http.HandleFunc("/", handler)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		fmt.Println("Server is not running")
+	}
+}
+
+//why here it uses *http.request: Because:
+/*Request data can be large
+Go does NOT copy it
+It sends reference (address)*/
+
+Routers:
+A router decides: “Which handler should run for this URL.It maps routes to handlers.
+Here the routing is handled by Go’s built-in net/http.
+When Do We Use Routers?
+
+Use routers when:
+You have multiple APIs
+You want clean code
+You need dynamic URLs
+You need middleware
+You build real REST APIs
+Example APIs:
+GET    /students
+POST   /students
+PUT    /students/1
+DELETE /students/1
+Difference Between Handler and Router
+Feature 	      	Handler				Router
+Purpose 			Handles request		Selects handler
+Role	 			Business logic		URL management
+Works with			Request & Response	Paths & methods
+Example				Login logic	/login → loginHandler
+Go already has a basic router inside net/http.
+Third-Party Routers
+Popular routers:
+Gorilla Mux
+for installing mux router use this command  : go get github.com/gorilla/mux
+ex:package main
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+type Student struct {
+	Id   string
+	Name string
+}
+
+func home(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Go routers")
+}
+
+func main() {
+	router := mux.NewRouter() //Creates router object. it does not create server 
+
+	router.HandleFunc("/", home).Methods("GET")
+	fmt.Print("Server running on port 8080")
+	http.ListenAndServe(":8080", router) //Use this router to handle requests
+}
+
+mux comes from:  Multiplexer
+In Go web development, a multiplexer (mux) is a component that:
+Receives requests and sends them to the correct handler.
+
+Why Name is "Multiplexer"
+Because it handles multiple routes and distributes requests.
+
+Even Go’s net/http has its own mux internally.
+Example:
+http.HandleFunc("/", homeHandler)
+This uses: DefaultServeMux
+
+Router's job:
+check URL
+decide which function to call
+Without router: manual route handling
+With router: clean route management
+Database connection:
+for database integration we need to install particular database driver in golang folder. 
+for ex: monogodb driver installtion use this command : go get go.mongodb.org/mongo-driver/mongo
+MongoDB does NOT store JSON directly.So it uses bson(binary json ).It is the format MongoDB uses internally to store data.
+In Go, your struct needs to map correctly to MongoDB fields.
+
+for postgresql with golang connection.
+need to install postgresql driver .for this use this command go get github.com/jackc/pgx/v5
+
+Nested jsons:
+Nested object in JSON → Nested struct in Go
+json.Unmarshal() converts JSON → Go struct
+json.Marshal() converts Go struct → JSON
+
+JWT:
+//for jwt tokens we need to install it by using this command :go get github.com/golang-jwt/jwt/v5
+//jwt(json web token)
+It is a small encoded token used for authentication and authorization between frontend and backend.
+A JWT usually looks like this:
