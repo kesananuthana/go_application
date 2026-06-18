@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
@@ -17,6 +16,21 @@ type Products struct {
 	Pid   string
 	Name  string
 	Price int
+}
+
+func withCORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Access-Control-Allow-Origin", "*") //Allows frontend from any origin to access backend.
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") //Allows frontend to send Content-Type header.
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		} //Browser first sends OPTIONS request for checking permissions. If request is OPTIONS: send status 200 OK stop function using return.
+
+		next(w, r) //Calls actual API function after CORS handling.
+	}
 }
 
 func greet(w http.ResponseWriter, r *http.Request) {
@@ -84,6 +98,8 @@ func productsByName(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	name := params["name"]
 
+	fmt.Println("Received name:", name)
+
 	row := conn.QueryRow(
 		context.Background(),
 		"select * from products where name = $1",
@@ -93,6 +109,8 @@ func productsByName(w http.ResponseWriter, r *http.Request) {
 	err := row.Scan(&p.Pid, &p.Name, &p.Price)
 
 	if err != nil {
+
+		fmt.Println("Scan error:", err)
 		fmt.Fprint(w, "product not found")
 		return
 	}
@@ -160,8 +178,8 @@ func deleteProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	//connStr := "postgres://postgres:nuthana@localhost:5432/users"
-	connStr := os.Getenv("db_url")
+	connStr := "postgres://postgres:nuthana@localhost:5432/users"
+	//connStr := os.Getenv("db_url")
 
 	var err error
 	conn, err = pgx.Connect(context.Background(), connStr)
@@ -170,14 +188,14 @@ func main() {
 	}
 	fmt.Print("Database connected")
 	router := mux.NewRouter()
-	router.HandleFunc("/", greet).Methods("GET")
-	router.HandleFunc("/addProducts", addProducts).Methods("POST")
-	router.HandleFunc("/products", getproducts).Methods("GET")
-	router.HandleFunc("/ProductById/{pid}", productsByid).Methods("GET")
-	router.HandleFunc("/ProductByName/{name}", productsByName).Methods("GET")
-	router.HandleFunc("/updateProducts/{pid}", updateProducts).Methods("PUT")
-	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE")
-	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE")
+	router.HandleFunc("/", withCORS(greet)).Methods("GET")
+	router.HandleFunc("/addProducts", withCORS(addProducts)).Methods("POST")
+	router.HandleFunc("/products", withCORS(getproducts)).Methods("GET")
+	router.HandleFunc("/ProductById/{pid}", withCORS(productsByid)).Methods("GET")
+	router.HandleFunc("/ProductByName/{name}", withCORS(productsByName)).Methods("GET")
+	router.HandleFunc("/updateProducts/{pid}", withCORS(updateProducts)).Methods("PUT")
+	router.HandleFunc("/deletProducts/{pid}", withCORS(deleteProductsById)).Methods("DELETE")
+	router.HandleFunc("/deleteProducts", withCORS(deleteProducts)).Methods("DELETE")
 	http.ListenAndServe(":8080", router)
 	fmt.Print("Server running on port 8080")
 }
