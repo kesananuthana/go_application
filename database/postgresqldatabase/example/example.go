@@ -18,21 +18,6 @@ type Products struct {
 	Price int
 }
 
-func withCORS(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		w.Header().Set("Access-Control-Allow-Origin", "*") //Allows frontend from any origin to access backend.
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type") //Allows frontend to send Content-Type header.
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		} //Browser first sends OPTIONS request for checking permissions. If request is OPTIONS: send status 200 OK stop function using return.
-
-		next(w, r) //Calls actual API function after CORS handling.
-	}
-}
-
 func greet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Welcome")
 }
@@ -188,14 +173,29 @@ func main() {
 	}
 	fmt.Print("Database connected")
 	router := mux.NewRouter()
-	router.HandleFunc("/", withCORS(greet)).Methods("GET")
-	router.HandleFunc("/addProducts", withCORS(addProducts)).Methods("POST")
-	router.HandleFunc("/products", withCORS(getproducts)).Methods("GET")
-	router.HandleFunc("/ProductById/{pid}", withCORS(productsByid)).Methods("GET")
-	router.HandleFunc("/ProductByName/{name}", withCORS(productsByName)).Methods("GET")
-	router.HandleFunc("/updateProducts/{pid}", withCORS(updateProducts)).Methods("PUT")
-	router.HandleFunc("/deletProducts/{pid}", withCORS(deleteProductsById)).Methods("DELETE")
-	router.HandleFunc("/deleteProducts", withCORS(deleteProducts)).Methods("DELETE")
+	router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	})
+
+	router.HandleFunc("/", greet).Methods("GET")
+	router.HandleFunc("/addProducts", addProducts).Methods("POST")
+	router.HandleFunc("/products", getproducts).Methods("GET")
+	router.HandleFunc("/ProductById/{pid}", productsByid).Methods("GET")
+	router.HandleFunc("/ProductByName/{name}", productsByName).Methods("GET")
+	router.HandleFunc("/updateProducts/{pid}", updateProducts).Methods("PUT")
+	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE")
+	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE")
 	http.ListenAndServe(":8080", router)
 	fmt.Print("Server running on port 8080")
 }
