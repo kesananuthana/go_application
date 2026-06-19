@@ -1,0 +1,32 @@
+name: Go API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Download Dependencies
+        run: go mod download
+
+      - name: Build Project  // it means it complies the project folders
+        run: go build ./...
+
+      - name: Run Tests
+        run: go test ./...
+      
+      - name: Trigger Render deploy 
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}  //it only deploys the code, not runs the code.
+

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5"
@@ -129,6 +128,31 @@ func updateProducts(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Product updated successfully")
 }
 
+func updateProductById(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	pid := params["pid"]
+
+	var p Products
+	json.NewDecoder(r.Body).Decode(&p)
+	res, err := conn.Exec(
+		context.Background(),
+		"update products set name = $2, price = $3 where pid = $1",
+		pid,
+		p.Name,
+		p.Price,
+	)
+	if err != nil {
+		fmt.Fprint(w, err)
+		return
+	}
+
+	if res.RowsAffected() == 0 {
+		fmt.Fprint(w, "Product not found")
+		return
+	}
+	fmt.Fprint(w, "Product updated successfully")
+}
+
 func deleteProductsById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	pid := params["pid"]
@@ -149,7 +173,6 @@ func deleteProductsById(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprint(w, "Product deleted successfully")
 }
-
 func deleteProducts(w http.ResponseWriter, r *http.Request) {
 	_, err := conn.Exec(
 		context.Background(),
@@ -164,8 +187,8 @@ func deleteProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	//connStr := "postgres://postgres:nuthana@localhost:5432/users"
-	connStr := os.Getenv("db_url")
+	connStr := "postgres://postgres:nuthana@localhost:5432/users"
+	//connStr := os.Getenv("db_url")
 
 	var err error
 	conn, err = pgx.Connect(context.Background(), connStr)
@@ -194,6 +217,7 @@ func main() {
 	router.HandleFunc("/ProductById/{pid}", productsByid).Methods("GET")
 	router.HandleFunc("/ProductByName/{name}", productsByName).Methods("GET")
 	router.HandleFunc("/updateProducts/{pid}", updateProducts).Methods("PUT")
+	router.HandleFunc("/updateProductById/{pid}", updateProductById).Methods("PUT")
 	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE")
 	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE")
 	http.ListenAndServe(":8080", router)
