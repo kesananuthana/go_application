@@ -53,9 +53,7 @@ func getproducts(w http.ResponseWriter, r *http.Request) {
 		var p Products
 		err := rows.Scan(&p.Pid, &p.Name, &p.Price)
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]string{
-				"message": "No Products found",
-			})
+			fmt.Fprint(w, err.Error())
 			return
 		}
 		products = append(products, p)
