@@ -204,7 +204,7 @@ func main() {
 			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-			if r.Method == "OPTIONS" {
+			if r.Method == http.MethodOptions {
 				w.WriteHeader(http.StatusOK)
 				return
 			}
@@ -219,8 +219,18 @@ func main() {
 	router.HandleFunc("/ProductByName/{name}", productsByName).Methods("GET")
 	router.HandleFunc("/updateProducts/{pid}", updateProducts).Methods("PUT")
 	router.HandleFunc("/updateProductById/{pid}", updateProductById).Methods("PUT")
-	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE")
-	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE")
+	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE", "OPTIONS")
+	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE", "OPTIONS")
 	http.ListenAndServe(":8080", router)
 	fmt.Print("Server running on port 8080")
 }
+
+/*corsHandler := handlers.CORS(
+	handlers.AllowedOrigins([]string{"*"}),
+	handlers.AllowedMethods([]string{
+		"GET", "POST", "PUT", "DELETE", "OPTIONS",
+	}),
+	handlers.AllowedHeaders([]string{
+		"Content-Type", "Authorization",
+	}),
+)*/
