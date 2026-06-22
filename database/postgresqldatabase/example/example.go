@@ -53,7 +53,9 @@ func getproducts(w http.ResponseWriter, r *http.Request) {
 		var p Products
 		err := rows.Scan(&p.Pid, &p.Name, &p.Price)
 		if err != nil {
-			fmt.Fprint(w, err.Error())
+			json.NewEncoder(w).Encode(map[string]string{
+				"message": "No Products found",
+			})
 			return
 		}
 		products = append(products, p)
@@ -74,7 +76,9 @@ func productsByid(w http.ResponseWriter, r *http.Request) {
 	err := row.Scan(&p.Pid, &p.Name, &p.Price)
 
 	if err != nil {
-		fmt.Fprint(w, "product not found")
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": "Product not found",
+		})
 		return
 	}
 	json.NewEncoder(w).Encode(p)
@@ -151,7 +155,9 @@ func updateProductById(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Product not found")
 		return
 	}
-	fmt.Fprint(w, "Product updated successfully")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Product updated successfully",
+	})
 }
 
 func deleteProductsById(w http.ResponseWriter, r *http.Request) {
@@ -171,8 +177,9 @@ func deleteProductsById(w http.ResponseWriter, r *http.Request) {
 	if res.RowsAffected() == 0 {
 		fmt.Fprint(w, "Product not exist")
 	}
-
-	fmt.Fprint(w, "Product deleted successfully")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Product deleted successfully",
+	})
 }
 func deleteProducts(w http.ResponseWriter, r *http.Request) {
 	_, err := conn.Exec(
@@ -184,7 +191,9 @@ func deleteProducts(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, err)
 		return
 	}
-	fmt.Fprint(w, "All Products deleted")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "All Products deleted",
+	})
 }
 
 func main() {
