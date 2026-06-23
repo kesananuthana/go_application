@@ -225,7 +225,7 @@ func main() {
 	router.HandleFunc("/ProductById/{pid}", productsByid).Methods("GET")
 	router.HandleFunc("/ProductByName/{name}", productsByName).Methods("GET")
 	router.HandleFunc("/updateProducts/{pid}", updateProducts).Methods("PUT")
-	router.HandleFunc("/updateProductById/{pid}", updateProductById).Methods("PUT")
+	router.HandleFunc("/updateProductById/{pid}", updateProductById).Methods("PUT", "OPTIONS")
 	router.HandleFunc("/deletProducts/{pid}", deleteProductsById).Methods("DELETE", "OPTIONS")
 	router.HandleFunc("/deleteProducts", deleteProducts).Methods("DELETE", "OPTIONS")
 	http.ListenAndServe(":8080", router)
