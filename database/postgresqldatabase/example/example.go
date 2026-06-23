@@ -36,7 +36,9 @@ func addProducts(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprint(w, err)
 	}
-	fmt.Fprint(w, "product added successfully")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Product added successfully",
+	})
 }
 func getproducts(w http.ResponseWriter, r *http.Request) {
 	rows, err := conn.Query(
@@ -220,7 +222,7 @@ func main() {
 		})
 	})
 	router.HandleFunc("/", greet).Methods("GET")
-	router.HandleFunc("/addProducts", addProducts).Methods("POST")
+	router.HandleFunc("/addProducts", addProducts).Methods("POST", "OPTIONS")
 	router.HandleFunc("/products", getproducts).Methods("GET")
 	router.HandleFunc("/ProductById/{pid}", productsByid).Methods("GET")
 	router.HandleFunc("/ProductByName/{name}", productsByName).Methods("GET")
